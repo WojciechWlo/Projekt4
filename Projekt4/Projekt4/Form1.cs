@@ -33,9 +33,20 @@ namespace Projekt4
             public int x;
             public int y;
         }
+        public struct Block
+        {
+            public int width;
+            public int height;
+            public int x;
+            public int y;
+            public int weight;
+            public char shape;
+            public int level;
+        }
         Crane crane;
         Winch winch;
         Hook hook;
+        List<Block> blocks = new List<Block>();
         public Form1()
         {
 
@@ -50,12 +61,29 @@ namespace Projekt4
             hook.height = 10;
             hook.x = winch.x + winch.width / 2 - hook.width / 2;
             hook.y = panel1.Height - crane.height + 50 + winch.height;
+            int []weights = { 100, 150, 200, 100, 100, 200, 300, 150 };
+            char[] shapes = { 'r', 'r', 'c', 'r', 'r', 'c', 'c', 'c' };
+            for(int i=0;i<8; i++)
+            {
+                Block block = new Block();
+                block.width = 40;
+                block.height = 40;
+                block.y = panel1.Height - block.height;
+                block.x = 130 + i * 40 + 10 * i;
+
+                block.level = 0;
+                block.weight = weights[i];
+                block.shape = shapes[i];
+                blocks.Add(block);
+
+            }
             panel1.Refresh();
         }
 
         private void panel1_Paint(object sender, PaintEventArgs e)
         {
             System.Drawing.SolidBrush pen = new System.Drawing.SolidBrush(System.Drawing.Color.Black);
+            Pen pen2 = new Pen(Color.Brown, 1);
             Graphics g = panel1.CreateGraphics();
             g.FillRectangle(pen, new Rectangle(panel1.Width / 5 - crane.width, panel1.Height - crane.height, crane.width, crane.height));
             g.FillRectangle(pen, new Rectangle(panel1.Width / 5 - crane.width - 50, panel1.Height - crane.height + 50, crane.length, crane.width));
@@ -66,6 +94,12 @@ namespace Projekt4
             pen = new System.Drawing.SolidBrush(System.Drawing.Color.Green);
             g.FillRectangle(pen, new Rectangle(hook.x + 4, panel1.Height - crane.height + 50 + winch.height, 2, hook.y - (panel1.Height - crane.height + 50 + winch.height)));
             pen = new System.Drawing.SolidBrush(System.Drawing.Color.Brown);
+            for (int i = 0; i < blocks.Count; i++)
+            {
+                if(blocks[i].shape =='r')g.FillRectangle(pen, new Rectangle(blocks[i].x, blocks[i].y, blocks[i].width, blocks[i].height));
+                else g.DrawEllipse(pen2, new Rectangle(blocks[i].x, blocks[i].y, blocks[i].width, blocks[i].height));
+            }
+            pen2.Dispose();
             pen.Dispose();
             g.Dispose();
 
