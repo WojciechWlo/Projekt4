@@ -32,6 +32,7 @@ namespace Projekt4
             public int height;
             public int x;
             public int y;
+            public int hanging;
         }
         public struct Block
         {
@@ -42,6 +43,7 @@ namespace Projekt4
             public int weight;
             public char shape;
             public int level;
+            public bool below;
         }
         Crane crane;
         Winch winch;
@@ -59,6 +61,7 @@ namespace Projekt4
             winch.height = winch.width;
             hook.width = 10;
             hook.height = 10;
+            hook.hanging = -1;
             hook.x = winch.x + winch.width / 2 - hook.width / 2;
             hook.y = panel1.Height - crane.height + 50 + winch.height;
             int []weights = { 100, 150, 200, 100, 100, 200, 300, 150 };
@@ -70,7 +73,6 @@ namespace Projekt4
                 block.height = 40;
                 block.y = panel1.Height - block.height;
                 block.x = 130 + i * 40 + 10 * i;
-
                 block.level = 0;
                 block.weight = weights[i];
                 block.shape = shapes[i];
@@ -114,6 +116,7 @@ namespace Projekt4
             {
                 winch.x -= 10;
                 hook.x -= 10;
+                move_block(-10, 'x');
             }
             panel1.Refresh();
         }
@@ -126,6 +129,7 @@ namespace Projekt4
             {
                 winch.x += 10;
                 hook.x += 10;
+                move_block(10, 'x');
             }
             panel1.Refresh();
         }
@@ -136,6 +140,7 @@ namespace Projekt4
             else
             {
                 hook.y += 10;
+                move_block(10, 'y');
             }
             panel1.Refresh();
         }
@@ -146,10 +151,137 @@ namespace Projekt4
             else
             {
                 hook.y -= 10;
+                move_block(-10, 'y');
             }
             panel1.Refresh();
         }
 
+        private int collision_hook_blocks()
+        {
+            for(int i=0; i<blocks.Count; i++)
+            {
+                if (hook.x +hook.width >=blocks[i].x && hook.x<=blocks[i].x+blocks[i].width && hook.y + hook.height >= blocks[i].y && hook.y <= blocks[i].y + blocks[i].height)
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
 
+        private int collision_block_blocks(Block block)
+        {
+            for (int i = 0; i < blocks.Count; i++)
+            {
+                if (i == hook.hanging) i++;
+                if (block.x + block.width > blocks[i].x && block.x < blocks[i].x + blocks[i].width && block.y + block.height > blocks[i].y && block.y < blocks[i].y + blocks[i].height)
+                {
+ 
+                    return i;
+                }
+
+            }
+            return -1;
+        }
+
+        private void move_block(int arg, char dir)
+        {
+            if(hook.hanging!=-1)
+            {
+                Block block = blocks[hook.hanging];
+                if (dir == 'x')
+                {
+                    block.x += arg;
+                    int nr = collision_block_blocks(block);
+                    if(nr!=-1 )
+                    {
+                        winch.x -= arg;
+                        block.x -= arg;
+                        hook.x -= arg;
+                    }
+                }
+                else
+                {
+                    block.y += arg;
+                    int nr = collision_block_blocks(block);
+                    if (nr != -1)
+                    {
+                        block.y -= arg;
+                        hook.y -= arg;
+                    }
+                    if (block.y+block.height>panel1.Height)
+                    {
+                        block.y = panel1.Height - block.height;
+                        hook.y -= arg;
+                    }
+                    
+                }
+                blocks[hook.hanging] = block;
+
+
+            }
+        }
+
+        private int block_below()
+        {
+
+            for(int i=0;i<blocks.Count;i++)
+            {
+                if (i == hook.hanging) i++;
+                if(blocks[hook.hanging].y + blocks[hook.hanging].height==blocks[i].y && blocks[hook.hanging].x + blocks[hook.hanging].width > blocks[i].x && blocks[hook.hanging].x < blocks[i].x + blocks[i].width)
+                return i;
+            }
+            return -1;
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            if(button5.Text =="Hang")
+            {
+                hook.hanging = collision_hook_blocks();
+                if (hook.hanging != -1)
+                {
+                    if (blocks[hook.hanging].below)
+                    {
+                        hook.hanging = -1;
+                    }
+                    else if(blocks[hook.hanging].shape!='r')
+                    {
+                        hook.hanging = -1;
+                    }
+                    else 
+                    {
+                        int nr = block_below();
+                        if (nr != -1)
+                        {
+                            Block block = blocks[nr];
+                            block.below = false;
+                            blocks[nr] = block;
+
+                        }
+                        button5.Text = "Put on";
+
+                    }
+                }
+            }
+            else
+            {
+                int nr = block_below();
+
+                if (nr != -1)
+                {
+                    Block block = blocks[nr];
+                    block.below = true;
+                    blocks[nr] = block;
+                    hook.hanging = -1;
+                    button5.Text = "Hang";
+                }
+                else if(blocks[hook.hanging].y + blocks[hook.hanging].height == panel1.Height)
+                {
+                    hook.hanging = -1;
+                    button5.Text = "Hang";
+                }
+            }
+
+        }
     }
 }
