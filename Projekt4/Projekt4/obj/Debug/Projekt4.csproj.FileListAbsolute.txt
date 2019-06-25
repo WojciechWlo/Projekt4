@@ -8,13 +8,3 @@ C:\Users\vojci\source\repos\Projekt4\Projekt4\obj\Debug\Projekt4.csproj.Generate
 C:\Users\vojci\source\repos\Projekt4\Projekt4\obj\Debug\Projekt4.csproj.CoreCompileInputs.cache
 C:\Users\vojci\source\repos\Projekt4\Projekt4\obj\Debug\Projekt4.exe
 C:\Users\vojci\source\repos\Projekt4\Projekt4\obj\Debug\Projekt4.pdb
-C:\Users\vojci\Projekty do Githuba\Projekt4\Projekt4\Projekt4\bin\Debug\Projekt4.exe.config
-C:\Users\vojci\Projekty do Githuba\Projekt4\Projekt4\Projekt4\bin\Debug\Projekt4.exe
-C:\Users\vojci\Projekty do Githuba\Projekt4\Projekt4\Projekt4\bin\Debug\Projekt4.pdb
-C:\Users\vojci\Projekty do Githuba\Projekt4\Projekt4\Projekt4\obj\Debug\Projekt4.csprojAssemblyReference.cache
-C:\Users\vojci\Projekty do Githuba\Projekt4\Projekt4\Projekt4\obj\Debug\Projekt4.Form1.resources
-C:\Users\vojci\Projekty do Githuba\Projekt4\Projekt4\Projekt4\obj\Debug\Projekt4.Properties.Resources.resources
-C:\Users\vojci\Projekty do Githuba\Projekt4\Projekt4\Projekt4\obj\Debug\Projekt4.csproj.GenerateResource.cache
-C:\Users\vojci\Projekty do Githuba\Projekt4\Projekt4\Projekt4\obj\Debug\Projekt4.csproj.CoreCompileInputs.cache
-C:\Users\vojci\Projekty do Githuba\Projekt4\Projekt4\Projekt4\obj\Debug\Projekt4.exe
-C:\Users\vojci\Projekty do Githuba\Projekt4\Projekt4\Projekt4\obj\Debug\Projekt4.pdb

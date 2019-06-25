@@ -33,6 +33,8 @@ namespace Projekt4
             public int x;
             public int y;
             public int hanging;
+            public char allowed_blocks;
+            public float max_weight;
         }
         public struct Block
         {
@@ -62,6 +64,9 @@ namespace Projekt4
             hook.width = 10;
             hook.height = 10;
             hook.hanging = -1;
+            hook.max_weight = 200;
+            textBox1.Text = hook.max_weight.ToString();
+            hook.allowed_blocks = 'r';
             hook.x = winch.x + winch.width / 2 - hook.width / 2;
             hook.y = panel1.Height - crane.height + 50 + winch.height;
             int []weights = { 100, 150, 200, 100, 100, 200, 300, 150 };
@@ -73,7 +78,7 @@ namespace Projekt4
                 block.height = 40;
                 block.y = panel1.Height - block.height;
                 block.x = 130 + i * 40 + 10 * i;
-                block.level = 0;
+                block.level = 1;
                 block.weight = weights[i];
                 block.shape = shapes[i];
                 blocks.Add(block);
@@ -136,6 +141,7 @@ namespace Projekt4
 
         private void button3_Click(object sender, EventArgs e)
         {
+            label1.Text = " ";
             if (hook.y >= panel1.Height - hook.height) hook.y = panel1.Height - hook.height;
             else
             {
@@ -147,6 +153,7 @@ namespace Projekt4
 
         private void button4_Click(object sender, EventArgs e)
         {
+            label1.Text = " ";
             if (hook.y <= panel1.Height - crane.height + 50 + winch.height) hook.y = panel1.Height - crane.height + 50 + winch.height;
             else
             {
@@ -158,7 +165,8 @@ namespace Projekt4
 
         private int collision_hook_blocks()
         {
-            for(int i=0; i<blocks.Count; i++)
+            label1.Text = " ";
+            for (int i=0; i<blocks.Count; i++)
             {
                 if (hook.x +hook.width >=blocks[i].x && hook.x<=blocks[i].x+blocks[i].width && hook.y + hook.height >= blocks[i].y && hook.y <= blocks[i].y + blocks[i].height)
                 {
@@ -170,6 +178,7 @@ namespace Projekt4
 
         private int collision_block_blocks(Block block)
         {
+            label1.Text = " ";
             for (int i = 0; i < blocks.Count; i++)
             {
                 if (i == hook.hanging) i++;
@@ -235,7 +244,8 @@ namespace Projekt4
 
         private void button5_Click(object sender, EventArgs e)
         {
-            if(button5.Text =="Hang")
+            
+            if (button5.Text =="Hang")
             {
                 hook.hanging = collision_hook_blocks();
                 if (hook.hanging != -1)
@@ -243,10 +253,18 @@ namespace Projekt4
                     if (blocks[hook.hanging].below)
                     {
                         hook.hanging = -1;
+                        label1.Text = "You can't hang this block!";
                     }
-                    else if(blocks[hook.hanging].shape!='r')
+                    else if(blocks[hook.hanging].shape!=hook.allowed_blocks)
                     {
                         hook.hanging = -1;
+                        label1.Text = "You can't hang blocks other than choosen!";
+                    }
+                    else if(blocks[hook.hanging].weight >hook.max_weight)
+                    {
+                        label1.Text = "To heavy! " + blocks[hook.hanging].weight.ToString();
+                        hook.hanging = -1;
+
                     }
                     else 
                     {
@@ -256,7 +274,6 @@ namespace Projekt4
                             Block block = blocks[nr];
                             block.below = false;
                             blocks[nr] = block;
-
                         }
                         button5.Text = "Put on";
 
@@ -270,10 +287,30 @@ namespace Projekt4
                 if (nr != -1)
                 {
                     Block block = blocks[nr];
-                    block.below = true;
-                    blocks[nr] = block;
-                    hook.hanging = -1;
-                    button5.Text = "Hang";
+                    if(blocks[nr].shape==blocks[hook.hanging].shape)
+                    {
+                        if(blocks[nr].level>=3)
+                        {
+                            label1.Text = "You cannot put block on third block";
+
+                        }
+                        else
+                        {
+                            block.below = true;
+                            blocks[nr] = block;
+                            block = blocks[hook.hanging];
+                            block.level = blocks[nr].level + 1;
+                            blocks[hook.hanging] = block;
+                            hook.hanging = -1;
+                            button5.Text = "Hang";
+                        }
+
+                    }
+                    else
+                    {
+                        label1.Text = "You cannot put block on blocks with different shape.";
+                    }
+
                 }
                 else if(blocks[hook.hanging].y + blocks[hook.hanging].height == panel1.Height)
                 {
@@ -282,6 +319,38 @@ namespace Projekt4
                 }
             }
 
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            if(hook.hanging!=-1)
+            {
+                label1.Text = "You first have to put current block on!";
+            }
+            else
+            {
+                if (button6.Text == "Rectangles")
+                {
+                    button6.Text = "Circles";
+                    hook.allowed_blocks = 'c';
+                }
+                else
+                {
+                    button6.Text = "Rectangles";
+                    hook.allowed_blocks = 'r';
+                }
+            }
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
+            if(hook.hanging!=-1)
+            {
+                label1.Text = "You first have to put current block on!";
+                textBox1.Text = hook.max_weight.ToString();
+            }
+            else hook.max_weight = float.Parse(textBox1.Text);
         }
     }
 }
