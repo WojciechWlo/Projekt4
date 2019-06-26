@@ -33,6 +33,8 @@ namespace Projekt4
             public int x;
             public int y;
             public int hanging;
+            public char allowed_blocks;
+            public float max_weight;
         }
         public struct Block
         {
@@ -55,25 +57,28 @@ namespace Projekt4
             InitializeComponent();
             crane.width = 20;
             crane.height = 350;
-            crane.length = 450;
-            winch.x = panel1.Width / 5;
+            crane.length = 550;
+            winch.x = panel1.Width / 5-50;
             winch.width = crane.width;
             winch.height = winch.width;
             hook.width = 10;
             hook.height = 10;
             hook.hanging = -1;
+            hook.max_weight = 200;
+            textBox1.Text = hook.max_weight.ToString();
+            hook.allowed_blocks = 'r';
             hook.x = winch.x + winch.width / 2 - hook.width / 2;
             hook.y = panel1.Height - crane.height + 50 + winch.height;
-            int []weights = { 100, 150, 200, 100, 100, 200, 300, 150 };
-            char[] shapes = { 'r', 'r', 'c', 'r', 'r', 'c', 'c', 'c' };
-            for(int i=0;i<8; i++)
+            int []weights = {100, 100, 150, 200, 100, 100, 200, 300, 150,230 };
+            char[] shapes = {'t', 'r', 'r', 'c', 'r', 'r', 'c', 'c', 't','t'};
+            for(int i=0;i<10; i++)
             {
                 Block block = new Block();
                 block.width = 40;
                 block.height = 40;
                 block.y = panel1.Height - block.height;
-                block.x = 130 + i * 40 + 10 * i;
-                block.level = 0;
+                block.x = 70 + i * 40 + 10 * i;
+                block.level = 1;
                 block.weight = weights[i];
                 block.shape = shapes[i];
                 blocks.Add(block);
@@ -85,23 +90,28 @@ namespace Projekt4
         private void panel1_Paint(object sender, PaintEventArgs e)
         {
             System.Drawing.SolidBrush pen = new System.Drawing.SolidBrush(System.Drawing.Color.Black);
-            Pen pen2 = new Pen(Color.Brown, 1);
             Graphics g = panel1.CreateGraphics();
-            g.FillRectangle(pen, new Rectangle(panel1.Width / 5 - crane.width, panel1.Height - crane.height, crane.width, crane.height));
-            g.FillRectangle(pen, new Rectangle(panel1.Width / 5 - crane.width - 50, panel1.Height - crane.height + 50, crane.length, crane.width));
+            g.FillRectangle(pen, new Rectangle(panel1.Width / 5 - crane.width-50, panel1.Height - crane.height, crane.width, crane.height));
+            g.FillRectangle(pen, new Rectangle(panel1.Width / 5 - crane.width - 100, panel1.Height - crane.height + 50, crane.length, crane.width));
+            g.FillRectangle(pen, new Rectangle(hook.x, hook.y, hook.width, hook.height));
+            g.FillRectangle(pen, new Rectangle(hook.x + 4, panel1.Height - crane.height + 50 + winch.height, 2, hook.y - (panel1.Height - crane.height + 50 + winch.height)));
             pen = new System.Drawing.SolidBrush(System.Drawing.Color.Blue);
             g.FillRectangle(pen, new Rectangle(winch.x, panel1.Height - crane.height + 50, winch.width, winch.height));
-            pen = new System.Drawing.SolidBrush(System.Drawing.Color.Red);
-            g.FillRectangle(pen, new Rectangle(hook.x, hook.y, hook.width, hook.height));
-            pen = new System.Drawing.SolidBrush(System.Drawing.Color.Green);
-            g.FillRectangle(pen, new Rectangle(hook.x + 4, panel1.Height - crane.height + 50 + winch.height, 2, hook.y - (panel1.Height - crane.height + 50 + winch.height)));
+
             pen = new System.Drawing.SolidBrush(System.Drawing.Color.Brown);
             for (int i = 0; i < blocks.Count; i++)
             {
-                if(blocks[i].shape =='r')g.FillRectangle(pen, new Rectangle(blocks[i].x, blocks[i].y, blocks[i].width, blocks[i].height));
-                else g.DrawEllipse(pen2, new Rectangle(blocks[i].x, blocks[i].y, blocks[i].width, blocks[i].height));
+                if (blocks[i].shape == 'r') g.FillRectangle(pen, new Rectangle(blocks[i].x, blocks[i].y, blocks[i].width, blocks[i].height));
+                else if (blocks[i].shape == 'c') g.FillEllipse(pen, new Rectangle(blocks[i].x, blocks[i].y, blocks[i].width, blocks[i].height));
+                else
+                {
+                    Point p1 = new Point(blocks[i].x, blocks[i].y+ blocks[i].height);
+                    Point p2 = new Point(blocks[i].x + blocks[i].width, blocks[i].y + blocks[i].height);
+                    Point p3 = new Point(blocks[i].x+blocks[i].width/2, blocks[i].y);
+
+                    g.FillPolygon(pen, new Point[]{p1,p2,p3});
+                }
             }
-            pen2.Dispose();
             pen.Dispose();
             g.Dispose();
 
@@ -111,7 +121,7 @@ namespace Projekt4
         private void button1_Click(object sender, EventArgs e)
         {
 
-            if (winch.x <= panel1.Width / 5) winch.x = panel1.Width / 5;
+            if (winch.x <= panel1.Width / 5-50) winch.x = panel1.Width / 5-50;
             else
             {
                 winch.x -= 10;
@@ -124,7 +134,7 @@ namespace Projekt4
         private void button2_Click(object sender, EventArgs e)
         {
 
-            if (winch.x >= crane.length - 50 - 2 * winch.width + panel1.Width / 5) winch.x = crane.length - 2 * winch.width - 50 + panel1.Width / 5;
+            if (winch.x >= crane.length - 100 - 2 * winch.width + panel1.Width / 5) winch.x = crane.length - 2 * winch.width - 100 + panel1.Width / 5;
             else
             {
                 winch.x += 10;
@@ -136,6 +146,7 @@ namespace Projekt4
 
         private void button3_Click(object sender, EventArgs e)
         {
+            label1.Text = " ";
             if (hook.y >= panel1.Height - hook.height) hook.y = panel1.Height - hook.height;
             else
             {
@@ -147,6 +158,7 @@ namespace Projekt4
 
         private void button4_Click(object sender, EventArgs e)
         {
+            label1.Text = " ";
             if (hook.y <= panel1.Height - crane.height + 50 + winch.height) hook.y = panel1.Height - crane.height + 50 + winch.height;
             else
             {
@@ -158,7 +170,8 @@ namespace Projekt4
 
         private int collision_hook_blocks()
         {
-            for(int i=0; i<blocks.Count; i++)
+            label1.Text = " ";
+            for (int i=0; i<blocks.Count; i++)
             {
                 if (hook.x +hook.width >=blocks[i].x && hook.x<=blocks[i].x+blocks[i].width && hook.y + hook.height >= blocks[i].y && hook.y <= blocks[i].y + blocks[i].height)
                 {
@@ -170,10 +183,11 @@ namespace Projekt4
 
         private int collision_block_blocks(Block block)
         {
+            label1.Text = " ";
             for (int i = 0; i < blocks.Count; i++)
             {
                 if (i == hook.hanging) i++;
-                if (block.x + block.width > blocks[i].x && block.x < blocks[i].x + blocks[i].width && block.y + block.height > blocks[i].y && block.y < blocks[i].y + blocks[i].height)
+                if (i != blocks.Count && block.x + block.width > blocks[i].x && block.x < blocks[i].x + blocks[i].width && block.y + block.height > blocks[i].y && block.y < blocks[i].y + blocks[i].height)
                 {
  
                     return i;
@@ -227,7 +241,7 @@ namespace Projekt4
             for(int i=0;i<blocks.Count;i++)
             {
                 if (i == hook.hanging) i++;
-                if(blocks[hook.hanging].y + blocks[hook.hanging].height==blocks[i].y && blocks[hook.hanging].x + blocks[hook.hanging].width > blocks[i].x && blocks[hook.hanging].x < blocks[i].x + blocks[i].width)
+                if(i!=blocks.Count && blocks[hook.hanging].y + blocks[hook.hanging].height==blocks[i].y && blocks[hook.hanging].x + blocks[hook.hanging].width > blocks[i].x && blocks[hook.hanging].x < blocks[i].x + blocks[i].width)
                 return i;
             }
             return -1;
@@ -235,7 +249,8 @@ namespace Projekt4
 
         private void button5_Click(object sender, EventArgs e)
         {
-            if(button5.Text =="Hang")
+            
+            if (button5.Text =="Hang")
             {
                 hook.hanging = collision_hook_blocks();
                 if (hook.hanging != -1)
@@ -243,10 +258,18 @@ namespace Projekt4
                     if (blocks[hook.hanging].below)
                     {
                         hook.hanging = -1;
+                        label1.Text = "You can't hang this block!";
                     }
-                    else if(blocks[hook.hanging].shape!='r')
+                    else if(blocks[hook.hanging].shape!=hook.allowed_blocks)
                     {
                         hook.hanging = -1;
+                        label1.Text = "You can't hang blocks other than choosen!";
+                    }
+                    else if(blocks[hook.hanging].weight >hook.max_weight)
+                    {
+                        label1.Text = "To heavy! " + blocks[hook.hanging].weight.ToString();
+                        hook.hanging = -1;
+
                     }
                     else 
                     {
@@ -256,7 +279,6 @@ namespace Projekt4
                             Block block = blocks[nr];
                             block.below = false;
                             blocks[nr] = block;
-
                         }
                         button5.Text = "Put on";
 
@@ -270,18 +292,78 @@ namespace Projekt4
                 if (nr != -1)
                 {
                     Block block = blocks[nr];
-                    block.below = true;
-                    blocks[nr] = block;
-                    hook.hanging = -1;
-                    button5.Text = "Hang";
+                    if(blocks[nr].shape==blocks[hook.hanging].shape)
+                    {
+                        if(blocks[nr].level>=3)
+                        {
+                            label1.Text = "You cannot put block on third block";
+
+                        }
+                        else
+                        {
+                            block.below = true;
+                            blocks[nr] = block;
+                            block = blocks[hook.hanging];
+                            block.level = blocks[nr].level + 1;
+                            blocks[hook.hanging] = block;
+                            hook.hanging = -1;
+                            button5.Text = "Hang";
+                        }
+
+                    }
+                    else
+                    {
+                        label1.Text = "You cannot put block on blocks with different shape.";
+                    }
+
                 }
                 else if(blocks[hook.hanging].y + blocks[hook.hanging].height == panel1.Height)
                 {
+                    Block block = blocks[hook.hanging];
+                    block.level = 1;
+                    blocks[hook.hanging] = block;
                     hook.hanging = -1;
                     button5.Text = "Hang";
                 }
             }
 
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            if(hook.hanging!=-1)
+            {
+                label1.Text = "You first have to put current block on!";
+            }
+            else
+            {
+                if (button6.Text == "Rectangles")
+                {
+                    button6.Text = "Circles";
+                    hook.allowed_blocks = 'c';
+                }
+                else if(button6.Text == "Circles")
+                {
+                    button6.Text = "Triangles";
+                    hook.allowed_blocks = 't';
+                }
+                else if (button6.Text == "Triangles")
+                {
+                    button6.Text = "Rectangles";
+                    hook.allowed_blocks = 'r';
+                }
+            }
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
+            if(hook.hanging!=-1)
+            {
+                label1.Text = "You first have to put current block on!";
+                textBox1.Text = hook.max_weight.ToString();
+            }
+            else hook.max_weight = float.Parse(textBox1.Text);
         }
     }
 }
